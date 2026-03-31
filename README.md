@@ -230,3 +230,38 @@ SELECT id, pickup_summary, dropoff_summary,
 FROM orders
 WHERE status = 'IN_TRANSIT';
 ```
+
+## Task 3 Verification
+
+Task 3 adds DTO classes, database-backed Service classes, and a `DevRunner` that verifies the `DTO + Service + database` chain in the `dev` profile.
+
+Files added for this task live under:
+
+- `backend/DeliveryManagement/src/main/java/com/laioffer/deliverymanagement/dto/`
+- `backend/DeliveryManagement/src/main/java/com/laioffer/deliverymanagement/service/`
+- `backend/DeliveryManagement/src/main/java/com/laioffer/deliverymanagement/DevRunner.java`
+
+Run the verification with:
+
+```bash
+cd backend/DeliveryManagement
+./gradlew bootRun --args="--spring.profiles.active=dev --spring.main.web-application-type=none"
+```
+
+What it checks on startup:
+
+1. Each MVP table can be queried through its Service.
+2. Each query can be mapped into the corresponding DTO.
+3. Basic table relationships can be read successfully, such as:
+   - user -> otp_challenge
+   - user -> orders
+   - delivery_center -> fleet_vehicle
+   - order -> order_parcel
+   - order -> payment
+
+Expected prerequisite:
+
+- The local PostgreSQL instance must accept the credentials configured in
+  `backend/DeliveryManagement/src/main/resources/application.properties`,
+  or you must override them with `DATABASE_URL`, `DATABASE_PORT`,
+  `DATABASE_USERNAME`, and `DATABASE_PASSWORD`.
