@@ -30,51 +30,51 @@
 
 | 任务 ID  | 任务描述                                                                                                                                                                                                | 分配角色        | 预计小时   | 前置依赖 | 进度 | 参与同学（含出勤/工时记录） |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------- | -------- | ---- | --------------------------- |
-| `T-1.11` | 承接 Sprint0 延后的数据库 DTO/Service/DevRunner：补齐认证所需的数据读写校验（包括 `app_user`、`otp_challenge` 以及认证后可读的中心/车辆 DTO 与服务调用路径），并保证 `dev` 环境启动校验通过且日志可核对 | 后端开发 × 1~2  | 6          | `T-0.12` | ✅   | @Qiyuan Huang               |
-| `T-1.12` | 建立并冻结 OpenAPI baseline：将注册/登录/JWT 与中心/车辆相关端点的请求/响应模型固化为单一事实来源，确保可用于前后端联调对齐（生成并导出 baseline 文件或可访问的契约页面）                               | 后端 Lead × 1   | 4          | `T-1.11` | ✅   | @Qiyuan Huang               |
-| `T-1.13` | 后端 P0：注册 API（邮箱/电话、OTP 发送、OTP 校验、密码哈希、优雅失败与关键错误码）并与 OpenAPI 契约对齐                                                                                                 | 后端 Lead × 1~2 | 4          | `T-1.12` | 🔄   | @Qiyuan Huang, @Yanjia Kan  |
-| `T-1.14` | 后端 P0：登录 API（JWT 颁发）与受保护资源的鉴权语义（JWT 校验、权限错误处理）并与 OpenAPI 契约对齐                                                                                                      | 后端 Lead × 1~2 | 3          | `T-1.13` | 🔄   | @Qiyuan Huang, @Lei Feng    |
+| `T-1.11` | 承接 Sprint0 延后的数据库 DTO/Service/DevRunner：补齐认证所需的数据读写校验（包括 `app_user`、`otp_challenge` 以及认证后可读的中心/车辆 DTO 与服务调用路径），并保证 `dev` 环境启动校验通过且日志可核对 | 后端开发 × 1~2  | 6          | `T-0.12` | ⬜   | @Qiyuan Huang               |
+| `T-1.12` | 建立并冻结 OpenAPI baseline：将注册/登录/JWT 与中心/车辆相关端点的请求/响应模型固化为单一事实来源，确保可用于前后端联调对齐（生成并导出 baseline 文件或可访问的契约页面）                               | 后端 Lead × 1   | 4          | `T-1.11` | ⬜   | @Qiyuan Huang               |
+| `T-1.13` | 后端 P0：注册 API（邮箱/电话、OTP 发送、OTP 校验、密码哈希、优雅失败与关键错误码）并与 OpenAPI 契约对齐                                                                                                 | 后端 Lead × 1~2 | 4          | `T-1.12` | ⬜   | @Qiyuan Huang, @Yanjia Kan  |
+| `T-1.14` | 后端 P0：登录 API（JWT 颁发）与受保护资源的鉴权语义（JWT 校验、权限错误处理）并与 OpenAPI 契约对齐                                                                                                      | 后端 Lead × 1~2 | 3          | `T-1.13` | ⬜   | @Qiyuan Huang, @Lei Feng    |
 | `T-1.15` | 后端 P0：中心 & 车辆 CRUD（至少实现认证后可读取的列表/详情；覆盖 `delivery_center` 与 `fleet_vehicle` 的最小读与必要写/状态变更接口）                                                                   | 后端开发 × 2    | 3          | `T-1.12` | ⬜   | @Hangyi Gan, @Yanjia Kan    |
 | `T-1.16` | 前端接口粒度：补齐后端 API client（register/login/OTP、JWT 存储与使用策略、统一错误映射；先不做高保真 UI）                                                                                              | 前端 Lead × 1~2 | 3          | `T-1.14` | ⬜   | @Yuyang Zhou, @Yiyuan Miao  |
 | `T-1.17` | 前端接口联调：把 `LoginPage`/`RegisterPage` 从占位逻辑替换为真实接口调用，并让 `AuthContext`/`ProtectedRoute` 使用后端 JWT（成功/失败均有可理解的 UI 反馈）                                             | 前端 Lead × 1~2 | 3          | `T-1.16` | ⬜   | @Yuyang Zhou, @Jiayi Gao    |
-| `T-1.18` | QA：完成注册/登录端到端 smoke（快乐路径 + 关键失败：重复账户、错误凭证、OTP 错误/过期），并输出可复现的测试证据                                                                                         | QA/测试 × 1~2   | 2          | `T-1.17` | ⬜   | @Yuyang Zhou, @Jiayi Gao     |
+| `T-1.18` | QA：完成注册/登录端到端 smoke（快乐路径 + 关键失败：重复账户、错误凭证、OTP 错误/过期），并输出可复现的测试证据                                                                                         | QA/测试 × 1~2   | 2          | `T-1.17` | ⬜   | @Yuyang Zhou, @Jiayi Gao    |
 |          |                                                                                                                                                                                                         | **冲刺总计**    | **28小时** | —        | —    | —                           |
 
 ---
 
-## 3.1 可直接下发的子任务拆分（建议）
+## 3.1 可直接下发的子任务拆分
 
 > 下面这一版是按“尽量减少互相等待、每人有清晰 ownership、PR 容易验收”来拆的。建议每个子任务只设 1 个主负责人，最多 1 个配合人。
 
-| 子任务 ID | 对应主任务 | 可直接发下去的内容 | 建议主负责人 | 建议配合人 | 交付物 / 完成标志 |
-| --------- | ---------- | ------------------ | ------------ | ---------- | ----------------- |
-| `T-1.11a` | `T-1.11` | 补齐 `app_user` / `otp_challenge` 的 DTO、Service、查询接口（按邮箱/手机号查用户、查最新 OTP、创建/消费 OTP） | @Qiyuan Huang | @Yanjia Kan | ✅ 已完成 |
-| `T-1.11b` | `T-1.11` | 补齐 `delivery_center` / `fleet_vehicle` 的 DTO、Service、最小读路径 | @Hangyi Gan | @Lei Feng | Service 可返回中心列表、车辆列表/详情 |
-| `T-1.11c` | `T-1.11` | 完善 DevRunner / seed 校验日志，启动时打印关键表数量与样例数据 | @Qiyuan Huang | @Hangyi Gan | ✅ 已完成 |
-| `T-1.12a` | `T-1.12` | 整理 Sprint 1 需要冻结的接口清单：register、send OTP、verify OTP / complete register、login、centers、vehicles | @Qiyuan Huang | @Yuyang Zhou | ✅ 已完成 |
-| `T-1.12b` | `T-1.12` | 生成并固定 OpenAPI / Swagger 入口，补齐请求体、响应体、错误体模型 | @Qiyuan Huang | @Lei Feng | ✅ 已完成 |
-| `T-1.13a` | `T-1.13` | 实现发送 OTP 接口：参数校验、生成 OTP、落库、重复账户拦截 | @Yanjia Kan | @Qiyuan Huang | ⬜ 待完成 |
-| `T-1.13b` | `T-1.13` | 实现完成注册接口：校验 OTP、创建/激活用户、密码哈希、错误码对齐 | @Qiyuan Huang | @Yanjia Kan | ✅ 已完成 |
-| `T-1.14a` | `T-1.14` | 实现登录接口：账号密码校验、JWT 颁发、返回 token 结构 | @Qiyuan Huang | @Lei Feng | ✅ 已完成 |
-| `T-1.14b` | `T-1.14` | 实现 JWT 校验、受保护路由、401/403 错误处理 | @Lei Feng | @Qiyuan Huang | ⬜ 待完成 |
-| `T-1.15a` | `T-1.15` | 实现中心列表 / 详情接口，字段与 DTO / OpenAPI 对齐 | @Hangyi Gan | @Yanjia Kan | 登录后可读中心数据 |
-| `T-1.15b` | `T-1.15` | 实现车辆列表 / 按中心查询接口；如来得及再补状态变更接口 | @Yanjia Kan | @Hangyi Gan | 登录后可读车辆数据 |
-| `T-1.16a` | `T-1.16` | 前端统一 API client：封装 `sendOtp` / `register` / `login` / `fetchCenters` | @Yiyuan Miao | @Yuyang Zhou | 页面不再直接写裸 `fetch` |
-| `T-1.16b` | `T-1.16` | JWT 存储、请求注入、统一错误对象映射 | @Yuyang Zhou | @Yiyuan Miao | 受保护请求自动带 token，错误结构统一 |
-| `T-1.17a` | `T-1.17` | 把 `RegisterPage` 接到真实接口，覆盖发送 OTP / 完成注册 / 错误提示 | @Jiayi Gao | @Yuyang Zhou | 浏览器里能真实注册，错误场景有提示 |
-| `T-1.17b` | `T-1.17` | 把 `LoginPage`、`AuthContext`、`ProtectedRoute` 接到 JWT 流程 | @Yuyang Zhou | @Jiayi Gao | 登录后能进受保护页面，退出后回登录页 |
-| `T-1.18a` | `T-1.18` | 编写 smoke checklist：happy path + 重复账户 + 错密码 + 错/过期 OTP | @Jiayi Gao | @Hao Chen | 一份可复测的 checklist / 测试说明 |
-| `T-1.18b` | `T-1.18` | 收集证据：截图、Postman 请求/响应、必要日志 | @Jiayi Gao | @Yuyang Zhou | PR / 测试报告里可直接贴证据 |
+| 子任务 ID | 对应主任务 | 可直接发下去的内容                                                                                             | 建议主负责人  | 建议配合人    | 交付物 / 完成标志                                   |
+| --------- | ---------- | -------------------------------------------------------------------------------------------------------------- | ------------- | ------------- | --------------------------------------------------- |
+| `T-1.11a` | `T-1.11`   | 补齐 `app_user` / `otp_challenge` 的 DTO、Service、查询接口（按邮箱/手机号查用户、查最新 OTP、创建/消费 OTP）  | @Qiyuan Huang | @Yanjia Kan   | Service 可被注册/登录流程直接调用，`dev` 启动无报错 |
+| `T-1.11b` | `T-1.11`   | 补齐 `delivery_center` / `fleet_vehicle` 的 DTO、Service、最小读路径                                           | @Hangyi Gan   | @Lei Feng     | Service 可返回中心列表、车辆列表/详情               |
+| `T-1.11c` | `T-1.11`   | 完善 DevRunner / seed 校验日志，启动时打印关键表数量与样例数据                                                 | @Qiyuan Huang | @Hangyi Gan   | `dev` profile 启动日志可作为验收证据                |
+| `T-1.12a` | `T-1.12`   | 整理 Sprint 1 需要冻结的接口清单：register、send OTP、verify OTP / complete register、login、centers、vehicles | @Qiyuan Huang | @Yuyang Zhou  | 一份固定端点清单，前后端都认这份                    |
+| `T-1.12b` | `T-1.12`   | 生成并固定 OpenAPI / Swagger 入口，补齐请求体、响应体、错误体模型                                              | @Qiyuan Huang | @Lei Feng     | swagger UI 地址或导出文件路径固定                   |
+| `T-1.13a` | `T-1.13`   | 实现发送 OTP 接口：参数校验、生成 OTP、落库、重复账户拦截                                                      | @Yanjia Kan   | @Qiyuan Huang | Postman 可打通“发送 OTP”成功/失败路径               |
+| `T-1.13b` | `T-1.13`   | 实现完成注册接口：校验 OTP、创建/激活用户、密码哈希、错误码对齐                                                | @Qiyuan Huang | @Yanjia Kan   | 新用户可注册成功，密码不落明文                      |
+| `T-1.14a` | `T-1.14`   | 实现登录接口：账号密码校验、JWT 颁发、返回 token 结构                                                          | @Qiyuan Huang | @Lei Feng     | 登录成功拿到 JWT                                    |
+| `T-1.14b` | `T-1.14`   | 实现 JWT 校验、受保护路由、401/403 错误处理                                                                    | @Lei Feng     | @Qiyuan Huang | 带 token 可访问，不带/错 token 被拦截               |
+| `T-1.15a` | `T-1.15`   | 实现中心列表 / 详情接口，字段与 DTO / OpenAPI 对齐                                                             | @Hangyi Gan   | @Yanjia Kan   | 登录后可读中心数据                                  |
+| `T-1.15b` | `T-1.15`   | 实现车辆列表 / 按中心查询接口；如来得及再补状态变更接口                                                        | @Yanjia Kan   | @Hangyi Gan   | 登录后可读车辆数据                                  |
+| `T-1.16a` | `T-1.16`   | 前端统一 API client：封装 `sendOtp` / `register` / `login` / `fetchCenters`                                    | @Yiyuan Miao  | @Yuyang Zhou  | 页面不再直接写裸 `fetch`                            |
+| `T-1.16b` | `T-1.16`   | JWT 存储、请求注入、统一错误对象映射                                                                           | @Yuyang Zhou  | @Yiyuan Miao  | 受保护请求自动带 token，错误结构统一                |
+| `T-1.17a` | `T-1.17`   | 把 `RegisterPage` 接到真实接口，覆盖发送 OTP / 完成注册 / 错误提示                                             | @Jiayi Gao    | @Yuyang Zhou  | 浏览器里能真实注册，错误场景有提示                  |
+| `T-1.17b` | `T-1.17`   | 把 `LoginPage`、`AuthContext`、`ProtectedRoute` 接到 JWT 流程                                                  | @Yuyang Zhou  | @Jiayi Gao    | 登录后能进受保护页面，退出后回登录页                |
+| `T-1.18a` | `T-1.18`   | 编写 smoke checklist：happy path + 重复账户 + 错密码 + 错/过期 OTP                                             | @Jiayi Gao    | @Hao Chen     | 一份可复测的 checklist / 测试说明                   |
+| `T-1.18b` | `T-1.18`   | 收集证据：截图、Postman 请求/响应、必要日志                                                                    | @Jiayi Gao    | @Yuyang Zhou  | PR / 测试报告里可直接贴证据                         |
 
-## 3.2 本周建议怎么发任务
+## 3.2 任务分配
 
-### A. 直接发给每个人的任务
+### A. 任务分配
 
-- `@Qiyuan Huang`：主抓 `T-1.11a`、`T-1.11c`、`T-1.12a`、`T-1.12b`、`T-1.13b`、`T-1.14a`，负责 Sprint 1 后端主链与 OpenAPI 基线。
-- `@Yanjia Kan`：主抓 `T-1.13a`、`T-1.15b`，配合 `T-1.11a` / `T-1.13b`。重点是 OTP 和车辆接口，两块都能并行推进。
-- `@Lei Feng`：主抓 `T-1.14b`，配合 `T-1.11b` / `T-1.12b`。重点放在 Spring Security / JWT 鉴权，不建议这周再背太多业务接口。
-- `@Hangyi Gan`：主抓 `T-1.11b`、`T-1.15a`。把中心/车辆数据层和中心接口打通，减少后面前端联调卡点。
-- `@Yuyang Zhou`：主抓 `T-1.16b`、`T-1.17b`，配合 `T-1.12a` / `T-1.16a` / `T-1.18b`，负责前端认证主链和联调节奏。
+- `@Qiyuan Huang`： `T-1.11a`、`T-1.11c`、`T-1.12a`、`T-1.12b`、`T-1.13b`、`T-1.14a`。负责把认证链路和 OpenAPI 基线先立住。
+- `@Yanjia Kan`：`T-1.13a`、`T-1.15b`，配合 `T-1.11a` / `T-1.13b`。重点是 OTP 和车辆接口，两块都能并行推进。
+- `@Lei Feng`： `T-1.14b`，配合 `T-1.11b` / `T-1.12b`。重点放在 Spring Security / JWT 鉴权，不建议这周再背太多业务接口。
+- `@Hangyi Gan`： `T-1.11b`、`T-1.15a`。把中心/车辆数据层和中心接口打通，减少后面前端联调卡点。
+- `@Yuyang Zhou`：主抓 `T-1.16b`、`T-1.17b`，配合 `T-1.12a` / `T-1.16a` / `T-1.18b`。你负责前端认证主链和联调节奏。
 - `@Yiyuan Miao`：主抓 `T-1.16a`。把 API client 封装好，给页面联调创造稳定入口。
 - `@Jiayi Gao`：主抓 `T-1.17a`、`T-1.18a`、`T-1.18b`。先接注册页，再顺手沉淀 smoke 测试说明和证据模板。
 - `@Hao Chen`：负责 Sprint 1 的跟进与卡点清理，不建议背核心实现；更适合盯 PR 顺序、文档入口、验收 checklist。
@@ -86,21 +86,13 @@
 - 前端先“底层封装”再“页面联调”。`Yiyuan` 先把 API client 和错误对象立起来，`Yuyang + Jiayi` 再把页面接上，这样返工最少。
 - QA 不要等到最后一天才开始。`Jiayi` 可以在后端接口一出来就先写 checklist，联调当天只补证据。
 
-### C. 建议下发顺序
+### C. 建议顺序
 
 1. 第一天先下发 `T-1.11*` 和 `T-1.12*`，因为这是后面所有接口和联调的前置。
 2. 同时并行下发 `T-1.16a` 的前端底层封装，让前端先用 mock / stub 形式把 client 层搭起来。
 3. `T-1.13*` 和 `T-1.15*` 在 OpenAPI baseline 定下来后立刻并行开做，不要串行等。
 4. `T-1.14*` 完成后马上接 `T-1.16b`、`T-1.17*`，把 JWT 流程打通。
 5. `T-1.18*` 从中段开始写 checklist，最后 1 天集中跑 smoke 和收证据。
-
-## 3.3 当前实现状态（方便协作）
-
-- `T-1.11` 已完成：认证最小读写路径、中心/车辆最小读路径、DevRunner 校验已跑通。
-- `T-1.12` 已完成：OpenAPI baseline 已冻结，源码路径见 `backend/DeliveryManagement/src/main/resources/static/openapi/sprint1-baseline.yaml`。
-- `T-1.13` 当前只剩 `T-1.13a`：`complete register` 已完成，`send OTP` 还需要补。
-- `T-1.14` 当前只剩 `T-1.14b`：`login + JWT issue` 已完成，JWT 校验和受保护路由还需要补。
-- 协作说明见 [OpenApiBaseline.md](./OpenApiBaseline.md) 和 [AuthBackendHandOff.md](./AuthBackendHandOff.md)。
 
 ## 4. 执行顺序与依赖
 
