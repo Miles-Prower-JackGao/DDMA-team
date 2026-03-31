@@ -16,3 +16,8 @@ logging:
   level:
     org.apache.coyote.http11.Http11InputBuffer: TRACE  # Incoming HTTP requests
     org.springframework.jdbc.datasource.init: DEBUG
+
+app:
+  auth:
+    jwt-secret: ${JWT_SECRET:ddma-sprint1-dev-secret-change-me}
+    jwt-expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}

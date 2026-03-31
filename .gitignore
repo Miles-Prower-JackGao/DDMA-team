@@ -1,2 +1,4 @@
 .DS_Store
 .idea/
+.gradle-cache/
+backend/DeliveryManagement/build/

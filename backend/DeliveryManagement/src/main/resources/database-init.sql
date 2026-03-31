@@ -193,19 +193,21 @@ CREATE INDEX idx_payment_stripe_intent ON payment (stripe_payment_intent_id);
 -- ------------------------------------------------------------
 INSERT INTO app_user (id, email, phone, password_hash, full_name, guest)
 VALUES
-    ('a0000001-0000-0000-0000-000000000001', 'alice@example.com', '+14155550101', '$2a$10$hashedpassword1', 'Alice Chen', FALSE),
-    ('a0000001-0000-0000-0000-000000000002', 'bob@example.com', '+14155550102', '$2a$10$hashedpassword2', 'Bob Martinez', FALSE),
-    ('a0000001-0000-0000-0000-000000000003', 'carol@example.com', '+14155550103', '$2a$10$hashedpassword3', 'Carol Park', FALSE),
-    ('a0000001-0000-0000-0000-000000000004', NULL, '+14155550199', NULL, NULL, TRUE);
+    ('a0000001-0000-0000-0000-000000000001', 'alice@example.com', '+14155550101', 'sha256$aliceSalt$31ec0d3708f9c886bbc8f70ac847795a8ea71535fc1db6e711487ea59f8f4a46', 'Alice Chen', FALSE),
+    ('a0000001-0000-0000-0000-000000000002', 'bob@example.com', '+14155550102', 'sha256$bobSalt$1ec3e83c8f525fadf8437624398e75579cd6ae9a62b11d808b5d4d549d0a3dcd', 'Bob Martinez', FALSE),
+    ('a0000001-0000-0000-0000-000000000003', 'carol@example.com', '+14155550103', 'sha256$carolSalt$4bee9d51fab068ec13f9a89e7c8cf3ff3129e16699c392e310fe4592f3063d5a', 'Carol Park', FALSE),
+    ('a0000001-0000-0000-0000-000000000004', NULL, '+14155550199', NULL, NULL, TRUE),
+    ('a0000001-0000-0000-0000-000000000005', 'pending@example.com', '+14155550105', 'sha256$pendingSalt$c63209282759b51bcc411cc5d69a608141d5ed00bba5cb12dd223a5ac21445b5', 'Pending User', TRUE);
 
 -- ------------------------------------------------------------
 -- otp_challenge
 -- ------------------------------------------------------------
 INSERT INTO otp_challenge (id, user_id, channel, code_hash, expires_at, consumed, attempt_count)
 VALUES
-    ('b0000002-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000001', 'EMAIL', '$2a$10$otphash_alice_used', NOW() - INTERVAL '10 minutes', TRUE, 1),
-    ('b0000002-0000-0000-0000-000000000002', 'a0000001-0000-0000-0000-000000000002', 'SMS', '$2a$10$otphash_bob_active', NOW() + INTERVAL '5 minutes', FALSE, 0),
-    ('b0000002-0000-0000-0000-000000000003', 'a0000001-0000-0000-0000-000000000003', 'EMAIL', '$2a$10$otphash_carol_expired', NOW() - INTERVAL '1 hour', FALSE, 3);
+    ('b0000002-0000-0000-0000-000000000001', 'a0000001-0000-0000-0000-000000000001', 'EMAIL', 'sha256$otpAlice$02a1fc10e82fa1f18474c1f855f8aa7970d3c75e55e12a6edcef583e7ac0ae1a', NOW() - INTERVAL '10 minutes', TRUE, 1),
+    ('b0000002-0000-0000-0000-000000000002', 'a0000001-0000-0000-0000-000000000002', 'SMS', 'sha256$otpBob$534eb235657f0ae5f91c259330aee47a122afedf1ba994f6843e19f88d52a107', NOW() + INTERVAL '5 minutes', FALSE, 0),
+    ('b0000002-0000-0000-0000-000000000003', 'a0000001-0000-0000-0000-000000000003', 'EMAIL', 'sha256$otpCarol$a77c553287177af63c0a8ec405bff36f25d6033b41666eab87e34618cdad430c', NOW() - INTERVAL '1 hour', FALSE, 3),
+    ('b0000002-0000-0000-0000-000000000004', 'a0000001-0000-0000-0000-000000000005', 'EMAIL', 'sha256$otpPending$cbada3f76f911740f875647953788c43c9ffdec79b400aa711aaad144726fe58', NOW() + INTERVAL '30 minutes', FALSE, 0);
 
 -- ------------------------------------------------------------
 -- delivery_center

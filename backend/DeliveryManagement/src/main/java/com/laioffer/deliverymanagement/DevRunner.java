@@ -3,6 +3,7 @@ package com.laioffer.deliverymanagement;
 import com.laioffer.deliverymanagement.dto.AppUserDto;
 import com.laioffer.deliverymanagement.dto.DeliveryCenterDto;
 import com.laioffer.deliverymanagement.dto.OrderDto;
+import com.laioffer.deliverymanagement.dto.OtpChallengeDto;
 import com.laioffer.deliverymanagement.service.AppUserService;
 import com.laioffer.deliverymanagement.service.DeliveryCenterService;
 import com.laioffer.deliverymanagement.service.FleetVehicleService;
@@ -16,6 +17,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Component
 @Profile("dev")
@@ -83,6 +87,8 @@ public class DevRunner implements ApplicationRunner {
                     orderService.findByUserId(firstUser.id()).size());
         }
 
+        runAuthReadWriteVerification();
+
         if (firstCenter != null) {
             logger.info("Center relation check: centerId={} -> vehicleCount={}",
                     firstCenter.id(),
@@ -97,5 +103,52 @@ public class DevRunner implements ApplicationRunner {
         }
 
         logger.info("DTO + Service + database verification finished.");
+    }
+
+    private void runAuthReadWriteVerification() {
+        String verificationSuffix = UUID.randomUUID().toString().replace("-", "");
+        String verificationEmail = "t111+" + verificationSuffix.substring(0, 12) + "@example.com";
+        String verificationPhone = "+1999" + verificationSuffix.substring(0, 8);
+
+        AppUserDto verificationUser = appUserService.createUser(
+                verificationEmail,
+                verificationPhone,
+                "$2a$10$t111verificationpasswordhash",
+                "T1.11 Verification User",
+                false,
+                "{\"source\":\"dev-runner\",\"scope\":\"t1.11\"}"
+        );
+
+        OtpChallengeDto verificationChallenge = otpChallengeService.createChallenge(
+                verificationUser.id(),
+                "EMAIL",
+                "$2a$10$t111verificationotphash",
+                OffsetDateTime.now().plusMinutes(15)
+        );
+
+        boolean userFoundByEmail = appUserService.findByEmail(verificationEmail).isPresent();
+        boolean userFoundByPhone = appUserService.findByPhone(verificationPhone).isPresent();
+        boolean userFoundByEither = appUserService.findByEmailOrPhone(verificationEmail).isPresent()
+                && appUserService.findByEmailOrPhone(verificationPhone).isPresent();
+        boolean latestOtpPresent = otpChallengeService.findLatestByUserId(verificationUser.id())
+                .map(otp -> otp.id().equals(verificationChallenge.id()))
+                .orElse(false);
+        boolean activeOtpPresent = otpChallengeService.findLatestActiveByUserId(verificationUser.id()).isPresent();
+        short incrementedAttemptCount = otpChallengeService.incrementAttemptCount(verificationChallenge.id())
+                .map(OtpChallengeDto::attemptCount)
+                .orElse((short) -1);
+        boolean challengeConsumed = otpChallengeService.markConsumed(verificationChallenge.id());
+
+        logger.info(
+                "Auth read/write check: createdUserId={}, userFoundByEmail={}, userFoundByPhone={}, userFoundByEither={}, latestOtpPresent={}, activeOtpPresent={}, incrementedAttemptCount={}, challengeConsumed={}",
+                verificationUser.id(),
+                userFoundByEmail,
+                userFoundByPhone,
+                userFoundByEither,
+                latestOtpPresent,
+                activeOtpPresent,
+                incrementedAttemptCount,
+                challengeConsumed
+        );
     }
 }
