@@ -268,7 +268,7 @@ VALUES
      '7743', 25, 9.75, 'USD',
      37.7612, -122.4201, 180.0, NOW() - INTERVAL '5 minutes',
      '{"route":"Mission-loop","distanceKm":0.8}',
-     '{"lastEvent":"PICKED_UP"}'),
+     '{"lastEvent":"PICKED_UP","dropoffLat":37.7550,"dropoffLng":-122.4350}'),
 
     ('e0000005-0000-0000-0000-000000000003',
      'a0000001-0000-0000-0000-000000000003',
