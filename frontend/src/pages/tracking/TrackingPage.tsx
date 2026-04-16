@@ -75,11 +75,10 @@ export function TrackingPage() {
   const pin = sessionStorage.getItem("handoffPin") ?? "----";
 
   const vehiclePosition =
-    tracking?.simLat && tracking?.simLng
-      ? { lat: Number(tracking.simLat), lng: Number(tracking.simLng) }
+    tracking?.sim_lat && tracking?.sim_lng
+      ? { lat: Number(tracking.sim_lat), lng: Number(tracking.sim_lng) }
       : null;
 
-  // SF 默认中心点
   const mapCenter = vehiclePosition ?? { lat: 37.7749, lng: -122.4194 };
 
   if (loading) {
@@ -92,7 +91,6 @@ export function TrackingPage() {
 
   return (
     <div>
-      {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <Button
           type="text"
@@ -147,7 +145,6 @@ export function TrackingPage() {
         />
       )}
 
-      {/* 真实 Google Maps */}
       <div
         style={{
           borderRadius: 16,
@@ -165,18 +162,16 @@ export function TrackingPage() {
             gestureHandling="greedy"
             disableDefaultUI={false}
           >
-            {/* 车辆位置 Marker */}
             {vehiclePosition && (
               <Marker
                 position={vehiclePosition}
-                title={tracking?.vehicleType === "DRONE" ? "无人机" : "机器人"}
+                title={tracking?.vehicle_type === "DRONE" ? "无人机" : "机器人"}
               />
             )}
           </Map>
         </APIProvider>
       </div>
 
-      {/* 送达提示 */}
       {isDelivered && (
         <Alert
           message="配送完成！包裹已送达目的地。"
@@ -186,7 +181,6 @@ export function TrackingPage() {
         />
       )}
 
-      {/* 进度步骤 */}
       <Card
         style={{ marginBottom: 20, borderRadius: 14 }}
         styles={{ body: { padding: "24px 28px" } }}
@@ -276,7 +270,6 @@ export function TrackingPage() {
         </div>
       </Card>
 
-      {/* ETA 信息 */}
       {!isDelivered && tracking && (
         <Card
           style={{ marginBottom: 20, borderRadius: 14 }}
@@ -287,12 +280,11 @@ export function TrackingPage() {
             strong
             style={{ fontSize: 20, color: "#4F6EF7", marginLeft: 8 }}
           >
-            ~{tracking.etaMinutes} 分钟
+            ~{tracking.eta_minutes} 分钟
           </Text>
         </Card>
       )}
 
-      {/* PIN + QR */}
       <Card
         style={{ borderRadius: 14 }}
         styles={{ body: { padding: "24px 28px" } }}

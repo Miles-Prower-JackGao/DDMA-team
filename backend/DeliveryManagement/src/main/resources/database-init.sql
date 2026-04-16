@@ -266,7 +266,7 @@ VALUES
      'IN_TRANSIT', 'ROBOT',
      '200 Valencia St, San Francisco, CA', '500 Guerrero St, San Francisco, CA',
      '7743', 25, 9.75, 'USD',
-     37.7612, -122.4201, 180.0, NOW() - INTERVAL '5 minutes',
+     37.8000, -122.4500, 180.0, NOW() - INTERVAL '5 minutes',
      '{"route":"Mission-loop","distanceKm":0.8}',
      '{"lastEvent":"PICKED_UP","dropoffLat":37.7550,"dropoffLng":-122.4350}'),
 

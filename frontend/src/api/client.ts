@@ -195,13 +195,13 @@ export function fetchVehicleDetail(vehicleId: string): Promise<FleetVehicle> {
 // ================== TRACKING ==================
 
 export interface TrackingState {
-  orderId: string;
+  order_id: string;
   status: "PENDING" | "IN_TRANSIT" | "DELIVERED" | "CANCELLED";
-  vehicleType: string;
-  simLat: number;
-  simLng: number;
-  simHeadingDeg: number;
-  etaMinutes: number;
+  vehicle_type: string;
+  sim_lat: number;
+  sim_lng: number;
+  sim_heading_deg: number;
+  eta_minutes: number;
 }
 
 export function getTracking(orderId: string): Promise<TrackingState> {
