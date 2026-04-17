@@ -86,7 +86,7 @@ public class OrderController {
                 orderId,
                 request.sizeTier(),
                 request.weightKg(),
-                request.fragile(),
+                Boolean.TRUE.equals(request.fragile()),
                 request.deliveryNotes()
         );
         return new CreateParcelResponse(parcel.id(), parcel.orderId(), parcel.sizeTier(), parcel.weightKg());

@@ -16,9 +16,12 @@ import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Component
 public class JwtService {
+
+    private static final Logger log = Logger.getLogger(JwtService.class.getName());
 
     private final byte[] secret;
     private final long expirationSeconds;
@@ -29,7 +32,10 @@ public class JwtService {
             @Value("${app.auth.jwt-expiration-seconds}") long expirationSeconds,
             ObjectMapper objectMapper
     ) {
-        this.secret = secret.getBytes(StandardCharsets.UTF_8);
+        // Mix a random startup nonce into the secret so every restart invalidates all existing tokens
+        String startupNonce = UUID.randomUUID().toString();
+        this.secret = (secret + "." + startupNonce).getBytes(StandardCharsets.UTF_8);
+        log.info("JwtService initialized — all previously issued tokens are now invalid");
         this.expirationSeconds = expirationSeconds;
         this.objectMapper = objectMapper;
     }

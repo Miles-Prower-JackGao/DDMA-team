@@ -14,7 +14,7 @@ public record CreateParcelRequest(
         @NotNull
         @DecimalMin("0.001")
         BigDecimal weightKg,
-        boolean fragile,
+        Boolean fragile,
         String deliveryNotes
 ) {
 }
