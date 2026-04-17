@@ -1,4 +1,4 @@
-// F8 — modified by Sida Xue.
+// F8.
 //
 // BEFORE (original stub — static placeholder, no real data):
 //

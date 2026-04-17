@@ -64,7 +64,7 @@ public class AppUserService {
         return repository.findById(id).map(AppUserService::toDto);
     }
 
-    // F8 — added by Sida Xue.
+    // F8
     // Persists fullName and phone changes, then re-fetches to return the updated record.
     // Follows the same pattern as activateUser(): @Modifying query + re-fetch.
     @Transactional

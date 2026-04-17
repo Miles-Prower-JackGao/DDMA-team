@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * F8 — created by Sida Xue.
+ * F8
  *
  * Handles user profile read and update via:
  *   GET /api/v1/users/me  — return current user's profile (same shape as /auth/me)
