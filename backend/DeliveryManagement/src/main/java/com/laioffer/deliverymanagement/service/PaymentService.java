@@ -4,7 +4,10 @@ import com.laioffer.deliverymanagement.dto.PaymentDto;
 import com.laioffer.deliverymanagement.entity.PaymentEntity;
 import com.laioffer.deliverymanagement.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +31,24 @@ public class PaymentService {
 
     public Optional<PaymentDto> findById(UUID id) {
         return repository.findById(id).map(PaymentService::toDto);
+    }
+
+    @Transactional
+    public PaymentDto createPayment(UUID orderId, BigDecimal amount) {
+        OffsetDateTime now = OffsetDateTime.now();
+        PaymentEntity saved = repository.save(new PaymentEntity(
+                null,
+                orderId,
+                null,
+                "SUCCEEDED",
+                amount,
+                "USD",
+                UUID.randomUUID().toString(),
+                now,
+                now,
+                null
+        ));
+        return toDto(saved);
     }
 
     public long count() {

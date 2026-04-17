@@ -243,3 +243,28 @@ export function addParcel(
     body: JSON.stringify(body),
   });
 }
+
+export interface PayOrderRequest {
+  vehicle_type: string;
+  price_usd: number;
+  eta_minutes: number;
+}
+
+export interface PayOrderResponse {
+  order_id: string;
+  handoff_pin: string;
+  vehicle_type: string;
+  eta_minutes: number;
+  total_amount: number;
+  currency: string;
+}
+
+export function payOrder(
+  orderId: string,
+  body: PayOrderRequest,
+): Promise<PayOrderResponse> {
+  return request<PayOrderResponse>(`/api/v1/orders/${orderId}/pay`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}

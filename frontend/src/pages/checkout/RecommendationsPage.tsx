@@ -6,7 +6,7 @@ import {
   SendOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -41,7 +41,26 @@ const VEHICLES = [
 
 export function RecommendationsPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selected, setSelected] = useState<VehicleKey>("robot");
+
+  const handleSelect = () => {
+    const vehicle = VEHICLES.find((v) => v.key === selected)!;
+    const orderId = searchParams.get("orderId");
+    sessionStorage.setItem(
+      "plan_choice",
+      JSON.stringify({
+        vehicleType: vehicle.key.toUpperCase(),
+        priceUsd: parseFloat(vehicle.price.replace("$", "")),
+        etaMinutes: parseInt(vehicle.eta.replace(/\D/g, ""), 10),
+      }),
+    );
+    if (orderId) {
+      navigate(`/checkout?orderId=${encodeURIComponent(orderId)}`);
+    } else {
+      navigate("/checkout");
+    }
+  };
 
   return (
     <div>
@@ -174,7 +193,7 @@ export function RecommendationsPage() {
       <Button
         type="primary"
         size="large"
-        onClick={() => navigate("/checkout")}
+        onClick={handleSelect}
         style={{
           borderRadius: 12,
           height: 52,

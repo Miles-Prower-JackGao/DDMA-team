@@ -6,6 +6,7 @@ import com.laioffer.deliverymanagement.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +66,45 @@ public class OrderService {
                 null
         ));
         return toDto(saved);
+    }
+
+    @Transactional
+    public OrderDto processPayment(
+            UUID orderId,
+            UUID fleetVehicleId,
+            String vehicleType,
+            String handoffPin,
+            int estimatedMinutes,
+            BigDecimal totalAmount
+    ) {
+        OrderEntity existing = repository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+        OffsetDateTime now = OffsetDateTime.now();
+        OrderEntity updated = new OrderEntity(
+                existing.id(),
+                existing.userId(),
+                existing.centerId(),
+                fleetVehicleId,
+                "IN_TRANSIT",
+                vehicleType,
+                existing.pickupSummary(),
+                existing.dropoffSummary(),
+                handoffPin,
+                estimatedMinutes,
+                totalAmount,
+                "USD",
+                existing.simLatitude(),
+                existing.simLongitude(),
+                existing.simHeadingDeg(),
+                existing.simUpdatedAt(),
+                existing.planSnapshot(),
+                existing.trackingState(),
+                existing.createdAt(),
+                now,
+                existing.version(),
+                existing.metadata()
+        );
+        return toDto(repository.save(updated));
     }
 
     public long count() {
