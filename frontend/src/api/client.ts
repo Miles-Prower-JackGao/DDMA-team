@@ -290,3 +290,22 @@ export function payOrder(
     body: JSON.stringify(body),
   });
 }
+
+// ================== TRACKING ==================
+
+export interface TrackingState {
+  order_id: string;
+  status: "PENDING" | "IN_TRANSIT" | "DELIVERED" | "CANCELLED";
+  vehicle_type: string;
+  handoff_pin?: string | null;
+  sim_lat: number;
+  sim_lng: number;
+  sim_heading_deg: number;
+  eta_minutes: number;
+}
+
+export function getTracking(orderId: string): Promise<TrackingState> {
+  return request<TrackingState>(`/api/v1/orders/${orderId}/tracking`, {
+    method: "GET",
+  });
+}

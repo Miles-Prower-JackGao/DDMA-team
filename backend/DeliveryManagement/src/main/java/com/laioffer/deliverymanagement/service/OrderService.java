@@ -1,12 +1,14 @@
 package com.laioffer.deliverymanagement.service;
 
 import com.laioffer.deliverymanagement.dto.OrderDto;
+import com.laioffer.deliverymanagement.entity.Jsonb;
 import com.laioffer.deliverymanagement.entity.OrderEntity;
 import com.laioffer.deliverymanagement.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -75,11 +77,14 @@ public class OrderService {
             String vehicleType,
             String handoffPin,
             int estimatedMinutes,
-            BigDecimal totalAmount
+            BigDecimal totalAmount,
+            BigDecimal startLatitude,
+            BigDecimal startLongitude
     ) {
         OrderEntity existing = repository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
         OffsetDateTime now = OffsetDateTime.now();
+        Jsonb trackingState = ensureTrackingState(existing, startLatitude, startLongitude);
         OrderEntity updated = new OrderEntity(
                 existing.id(),
                 existing.userId(),
@@ -93,18 +98,59 @@ public class OrderService {
                 estimatedMinutes,
                 totalAmount,
                 "USD",
-                existing.simLatitude(),
-                existing.simLongitude(),
-                existing.simHeadingDeg(),
-                existing.simUpdatedAt(),
+                startLatitude,
+                startLongitude,
+                BigDecimal.ZERO,
+                now,
                 existing.planSnapshot(),
-                existing.trackingState(),
+                trackingState,
                 existing.createdAt(),
                 now,
                 existing.version(),
                 existing.metadata()
         );
         return toDto(repository.save(updated));
+    }
+
+    private static Jsonb ensureTrackingState(
+            OrderEntity existing,
+            BigDecimal startLatitude,
+            BigDecimal startLongitude
+    ) {
+        if (existing.trackingState() != null) {
+            String trackingJson = existing.trackingState().value();
+            if (trackingJson.contains("\"dropoffLat\"") && trackingJson.contains("\"dropoffLng\"")) {
+                return existing.trackingState();
+            }
+        }
+
+        BigDecimal dropoffLatitude = deriveDropoffLatitude(startLatitude, existing.dropoffSummary());
+        BigDecimal dropoffLongitude = deriveDropoffLongitude(startLongitude, existing.dropoffSummary());
+
+        String trackingJson = String.format(
+                "{\"lastEvent\":\"PICKED_UP\",\"dropoffLat\":%s,\"dropoffLng\":%s}",
+                dropoffLatitude.toPlainString(),
+                dropoffLongitude.toPlainString()
+        );
+        return Jsonb.of(trackingJson);
+    }
+
+    private static BigDecimal deriveDropoffLatitude(BigDecimal centerLatitude, String dropoffSummary) {
+        int hash = Math.abs(dropoffSummary == null ? 0 : dropoffSummary.hashCode());
+        double offset = 0.010 + (hash % 15) / 1000.0;
+        int sign = ((hash >> 1) & 1) == 0 ? 1 : -1;
+        return centerLatitude
+                .add(BigDecimal.valueOf(sign * offset))
+                .setScale(7, RoundingMode.HALF_UP);
+    }
+
+    private static BigDecimal deriveDropoffLongitude(BigDecimal centerLongitude, String dropoffSummary) {
+        int hash = Math.abs(dropoffSummary == null ? 0 : dropoffSummary.hashCode());
+        double offset = 0.010 + ((hash / 31) % 15) / 1000.0;
+        int sign = ((hash >> 2) & 1) == 0 ? 1 : -1;
+        return centerLongitude
+                .add(BigDecimal.valueOf(sign * offset))
+                .setScale(7, RoundingMode.HALF_UP);
     }
 
     public long count() {

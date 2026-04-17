@@ -3,6 +3,7 @@ package com.laioffer.deliverymanagement.controller;
 import com.laioffer.deliverymanagement.api.ApiException;
 import com.laioffer.deliverymanagement.auth.AuthenticatedUser;
 import com.laioffer.deliverymanagement.dto.FleetVehicleDto;
+import com.laioffer.deliverymanagement.dto.DeliveryCenterDto;
 import com.laioffer.deliverymanagement.dto.OrderDto;
 import com.laioffer.deliverymanagement.dto.OrderParcelDto;
 import com.laioffer.deliverymanagement.service.DeliveryCenterService;
@@ -114,6 +115,8 @@ public class OrderController {
         }
 
         List<FleetVehicleDto> vehicles = fleetVehicleService.findByCenterId(order.centerId());
+        DeliveryCenterDto center = deliveryCenterService.findById(order.centerId())
+                .orElseThrow(() -> new ApiException(404, "CENTER_NOT_FOUND", "Delivery center not found."));
         FleetVehicleDto vehicle = vehicles.stream()
                 .filter(v -> v.available() && request.vehicleType().equals(v.vehicleType()))
                 .findFirst()
@@ -124,7 +127,8 @@ public class OrderController {
 
         orderService.processPayment(
                 orderId, vehicle.id(), request.vehicleType(),
-                handoffPin, request.etaMinutes(), request.priceUsd()
+                handoffPin, request.etaMinutes(), request.priceUsd(),
+                center.latitude(), center.longitude()
         );
         fleetVehicleService.markUnavailable(vehicle.id());
         paymentService.createPayment(orderId, request.priceUsd());
