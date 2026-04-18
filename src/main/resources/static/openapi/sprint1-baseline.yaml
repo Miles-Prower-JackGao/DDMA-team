@@ -1,0 +1,433 @@
+openapi: 3.0.3
+info:
+  title: DDMA Sprint 1 API Baseline
+  version: 1.0.0-sprint1
+  description: >
+    Frozen API baseline for Sprint 1 authentication and minimum center/vehicle
+    read access. This file is the contract source for frontend/backend alignment
+    before implementation of controllers is completed.
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+tags:
+  - name: Auth
+    description: Registration, OTP, login, and current-user auth endpoints
+  - name: Centers
+    description: Delivery center read endpoints
+  - name: Vehicles
+    description: Fleet vehicle read endpoints
+paths:
+  /api/v1/auth/register/otp:
+    post:
+      tags: [Auth]
+      summary: Send registration OTP
+      operationId: sendRegistrationOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendRegistrationOtpRequest'
+      responses:
+        '202':
+          description: OTP challenge created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendRegistrationOtpResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/v1/auth/register/complete:
+    post:
+      tags: [Auth]
+      summary: Complete registration with OTP
+      operationId: completeRegistration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteRegistrationRequest'
+      responses:
+        '201':
+          description: User account created or activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email or phone and password
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current authenticated user
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppUserSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/centers:
+    get:
+      tags: [Centers]
+      summary: List delivery centers
+      operationId: listCenters
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Delivery centers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeliveryCenter'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/centers/{centerId}:
+    get:
+      tags: [Centers]
+      summary: Get center detail
+      operationId: getCenterById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CenterId'
+      responses:
+        '200':
+          description: Delivery center detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryCenter'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/centers/{centerId}/vehicles:
+    get:
+      tags: [Vehicles]
+      summary: List vehicles under a delivery center
+      operationId: listVehiclesByCenter
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CenterId'
+      responses:
+        '200':
+          description: Fleet vehicles under the given center
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FleetVehicle'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/vehicles/{vehicleId}:
+    get:
+      tags: [Vehicles]
+      summary: Get vehicle detail
+      operationId: getVehicleById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      responses:
+        '200':
+          description: Vehicle detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FleetVehicle'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    CenterId:
+      name: centerId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    VehicleId:
+      name: vehicleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    BadRequest:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Authentication failed or missing
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Resource already exists or state conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    SendRegistrationOtpRequest:
+      type: object
+      description: >
+        Either email or phone must be provided. Password is collected at this
+        step and persisted only as a hash after registration is completed.
+      required:
+        - full_name
+        - password
+        - channel
+      properties:
+        full_name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          maxLength: 50
+        password:
+          type: string
+          minLength: 8
+        channel:
+          $ref: '#/components/schemas/OtpChannel'
+    SendRegistrationOtpResponse:
+      type: object
+      required:
+        - challenge_id
+        - channel
+        - expires_at
+        - message
+      properties:
+        challenge_id:
+          type: string
+          format: uuid
+        channel:
+          $ref: '#/components/schemas/OtpChannel'
+        expires_at:
+          type: string
+          format: date-time
+        message:
+          type: string
+    CompleteRegistrationRequest:
+      type: object
+      required:
+        - challenge_id
+        - otp_code
+      properties:
+        challenge_id:
+          type: string
+          format: uuid
+        otp_code:
+          type: string
+          minLength: 4
+          maxLength: 12
+    RegistrationResponse:
+      type: object
+      required:
+        - user
+        - message
+      properties:
+        user:
+          $ref: '#/components/schemas/AppUserSummary'
+        message:
+          type: string
+    LoginRequest:
+      type: object
+      required:
+        - identifier
+        - password
+      properties:
+        identifier:
+          type: string
+          description: Email or phone number
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      required:
+        - access_token
+        - token_type
+        - expires_in
+        - user
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          format: int64
+          description: Token lifetime in seconds
+        user:
+          $ref: '#/components/schemas/AppUserSummary'
+    AppUserSummary:
+      type: object
+      required:
+        - id
+        - guest
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        full_name:
+          type: string
+          nullable: true
+        guest:
+          type: boolean
+    DeliveryCenter:
+      type: object
+      required:
+        - id
+        - name
+        - latitude
+        - longitude
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        address_line:
+          type: string
+          nullable: true
+        service_area_geo:
+          type: object
+          nullable: true
+          additionalProperties: true
+        metadata:
+          type: object
+          nullable: true
+          additionalProperties: true
+    FleetVehicle:
+      type: object
+      required:
+        - id
+        - center_id
+        - vehicle_type
+        - available
+      properties:
+        id:
+          type: string
+          format: uuid
+        center_id:
+          type: string
+          format: uuid
+        vehicle_type:
+          $ref: '#/components/schemas/VehicleType'
+        available:
+          type: boolean
+        external_device_id:
+          type: string
+          nullable: true
+        telemetry_hint:
+          type: object
+          nullable: true
+          additionalProperties: true
+        metadata:
+          type: object
+          nullable: true
+          additionalProperties: true
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: AUTH_INVALID_CREDENTIALS
+        message:
+          type: string
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+        trace_id:
+          type: string
+          nullable: true
+    OtpChannel:
+      type: string
+      enum:
+        - EMAIL
+        - SMS
+    VehicleType:
+      type: string
+      enum:
+        - DRONE
+        - ROBOT
